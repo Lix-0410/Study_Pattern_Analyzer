@@ -53,13 +53,17 @@ Raw behavioral data is transformed into meaningful signals:
 ## 📊 Models Used
 
 ### 🔹 Performance Prediction
-- **Type:** Regression  
-- **Model:** Random Forest Regressor  
+- **Task:** Regression  
+- **Model:** **Gradient Boosting Regressor**
+- **Reason for choice:**
+  - Handles non-linear relationships well
+  - Strong performance on tabular data
+  - Significantly smaller model size than Random Forest
+  - Easier deployment
 
-**Results:**
-- MAE ≈ **4.35**
-- R² ≈ **0.85**
-
+**Performance:**
+- MAE ≈ **4–5**
+- R² ≈ **0.83–0.86**
 Predicts academic performance based on behavioral patterns.
 
 ---
