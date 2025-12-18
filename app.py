@@ -77,27 +77,54 @@ def burnout_advice(burnout_prob, user):
     advice = []
 
     if burnout_prob >= 0.75:
-        advice.append("⚠️ Very high burnout risk detected.")
-
-        if user["sleep_hours"] < 6:
-            advice.append("Increase sleep to at least 7 hours.")
-
-        if user["study_hours"] > 6:
-            advice.append("Reduce daily study hours temporarily.")
-
-        if user["screen_time"] > 6:
-            advice.append("Limit screen exposure, especially at night.")
-
-        advice.append("Take a rest or light study day this week.")
-
+        advice.append("🚨 You are at a very high risk of burnout.")
     elif burnout_prob >= 0.4:
-        advice.append("⚠️ Moderate burnout risk.")
-        advice.append("Maintain balance and monitor fatigue levels.")
-
+        advice.append("⚠️ You may be approaching burnout.")
     else:
-        advice.append("✅ Low burnout risk. Keep your current routine.")
+        advice.append("✅ Your burnout risk is currently low.")
+
+    if user["sleep_hours"] < 5:
+        advice.append(
+            "😴 Your sleep is very low. Sleeping less than 5 hours can seriously affect focus and recovery."
+        )
+    elif user["sleep_hours"] < 7:
+        advice.append(
+            "🛌 You might benefit from a bit more sleep. Aim for 7–8 hours if possible."
+        )
+
+    if user["study_hours"] > 8:
+        advice.append(
+            "📚 You're studying for long hours. Consider shorter, more focused sessions."
+        )
+    elif user["study_hours"] > 6:
+        advice.append(
+            "📖 Your study load is on the higher side. Make sure to include proper breaks."
+        )
+
+    if user["screen_time"] > 8:
+        advice.append(
+            "📱 Very high screen time detected. This can increase mental fatigue and disturb sleep."
+        )
+    elif user["screen_time"] > 6:
+        advice.append(
+            "📵 Reducing screen time, especially at night, may help improve recovery."
+        )
+        
+    if burnout_prob >= 0.75:
+        advice.append(
+            "🧠 Consider taking a full rest day or significantly reducing workload this week."
+        )
+    elif burnout_prob >= 0.4:
+        advice.append(
+            "🔍 Monitor how you feel over the next few days and avoid pushing beyond your limits."
+        )
+    else:
+        advice.append(
+            "👍 Keep maintaining a healthy balance between work, rest, and personal time."
+        )
 
     return advice
+
 
 if st.button("🔍 Analyze My Study Pattern"):
     perf_pred = perf_model.predict(df_input)[0]
@@ -110,3 +137,4 @@ if st.button("🔍 Analyze My Study Pattern"):
     st.subheader("🧠 Recommendations")
     for tip in burnout_advice(burnout_prob, input_data):
         st.write("•", tip)
+
