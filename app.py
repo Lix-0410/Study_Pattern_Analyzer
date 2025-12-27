@@ -7,110 +7,71 @@ burnout_model = joblib.load("models/burnout_model.pkl")
 
 st.header("🧑‍🎓 Your Study Details")
 
-# ⏱️ STUDY TIME 
-
-if "study_time" not in st.session_state:
-    st.session_state.study_time = 4.0  # hours
+# ⏱️ STUDY TIME (Hours + Minutes)
 
 st.subheader("⏱️ Study Duration")
 
-study_slider = st.slider(
-    "Study time (quick select)",
-    min_value=0.0,
-    max_value=10.0,
-    step=1/6,  # 10 minutes
-    value=st.session_state.study_time,
-    key="study_slider"
-)
-
-st.session_state.study_time = study_slider
-
-study_h = int(st.session_state.study_time)
-study_m = int(round((st.session_state.study_time - study_h) * 60 / 10) * 10)
-
 col1, col2 = st.columns(2)
 with col1:
-    h = st.number_input(
+    study_hours_h = st.number_input(
         "Study hours",
         min_value=0,
         max_value=10,
         step=1,
-        value=study_h,
-        key="study_hours_input"
+        value=4
     )
+
 with col2:
-    m = st.number_input(
-        "Study minutes (10-min steps)",
+    study_minutes = st.number_input(
+        "Study minutes (10-minute steps)",
         min_value=0,
         max_value=50,
         step=10,
-        value=study_m,
-        key="study_minutes_input"
+        value=0
     )
 
-st.session_state.study_time = h + m / 60
-study_hours = st.session_state.study_time
+study_hours = study_hours_h + study_minutes / 60
+st.caption(f"📌 Total study time: **{study_hours_h}h {study_minutes}m**")
 
-st.caption(f"📌 Final study time: **{h}h {m}m**")
-
-# 😴 SLEEP TIME (SYNCED)
-
-if "sleep_time" not in st.session_state:
-    st.session_state.sleep_time = 7.0
+# 😴 SLEEP TIME (Hours + Minutes)
 
 st.subheader("😴 Sleep Duration")
 
-sleep_slider = st.slider(
-    "Sleep time (quick select)",
-    min_value=1.0,
-    max_value=10.0,
-    step=1/6,
-    value=st.session_state.sleep_time,
-    key="sleep_slider"
-)
-
-st.session_state.sleep_time = sleep_slider
-
-sleep_h = int(st.session_state.sleep_time)
-sleep_m = int(round((st.session_state.sleep_time - sleep_h) * 60 / 10) * 10)
-
 col1, col2 = st.columns(2)
 with col1:
-    h = st.number_input(
+    sleep_hours_h = st.number_input(
         "Sleep hours",
         min_value=1,
         max_value=10,
         step=1,
-        value=sleep_h,
-        key="sleep_hours_input"
+        value=7
     )
+
 with col2:
-    m = st.number_input(
-        "Sleep minutes (10-min steps)",
+    sleep_minutes = st.number_input(
+        "Sleep minutes (10-minute steps)",
         min_value=0,
         max_value=50,
         step=10,
-        value=sleep_m,
-        key="sleep_minutes_input"
+        value=0
     )
 
-st.session_state.sleep_time = h + m / 60
-sleep_hours = st.session_state.sleep_time
-
-st.caption(f"🛌 Final sleep time: **{h}h {m}m**")
+sleep_hours = sleep_hours_h + sleep_minutes / 60
+st.caption(f"🛌 Total sleep: **{sleep_hours_h}h {sleep_minutes}m**")
 
 # ☕ BREAKS
 
 st.subheader("☕ Breaks")
 
-break_count = st.slider(
+break_count = st.number_input(
     "Number of breaks",
     min_value=0,
     max_value=10,
+    step=1,
     value=3
 )
 
-avg_break_duration = st.slider(
+avg_break_duration = st.number_input(
     "Average break duration (minutes)",
     min_value=5,
     max_value=40,
@@ -118,28 +79,41 @@ avg_break_duration = st.slider(
     value=10
 )
 
-# 📱 SCREEN TIME 
+# 📱 SCREEN TIME (Hours + Minutes)
 
 st.subheader("📱 Screen Time")
 
-screen_time = st.slider(
-    "Total screen time",
-    min_value=0.0,
-    max_value=12.0,
-    step=1/6,
-    value=4.0
-)
+col1, col2 = st.columns(2)
+with col1:
+    screen_hours = st.number_input(
+        "Screen hours",
+        min_value=0,
+        max_value=12,
+        step=1,
+        value=4
+    )
 
-st.caption(f"📱 Screen time: **{round(screen_time, 2)} hours**")
+with col2:
+    screen_minutes = st.number_input(
+        "Screen minutes (10-minute steps)",
+        min_value=0,
+        max_value=50,
+        step=10,
+        value=0
+    )
 
-# 📚 DIFFICULTY
+screen_time = screen_hours + screen_minutes / 60
+st.caption(f"📱 Total screen time: **{screen_hours}h {screen_minutes}m**")
+
+# 📚 STUDY DIFFICULTY
 
 st.subheader("📚 Study Difficulty")
 
-difficulty_level = st.slider(
+difficulty_level = st.number_input(
     "Difficulty (1 = Easy, 5 = Very Hard)",
     min_value=1,
     max_value=5,
+    step=1,
     value=3
 )
 
@@ -158,21 +132,24 @@ revision_done = st.radio(
 
 st.subheader("🙂 Mental State")
 
-mood_score = st.slider(
-    "Mental state (1 = Very stressed, 5 = Highly motivated)",
+mood_score = st.number_input(
+    "Mood (1 = Very stressed, 5 = Highly motivated)",
     min_value=1,
     max_value=5,
+    step=1,
     value=3
 )
 
-st.markdown("### 📝 Summary")
+# 📝 DAILY SUMMARY
+
+st.markdown("### 📝 Daily Summary")
 
 st.write(
     f"""
-    • **Study:** {study_h}h {study_m}m  
-    • **Sleep:** {sleep_h}h {sleep_m}m  
+    • **Study:** {study_hours_h}h {study_minutes}m  
+    • **Sleep:** {sleep_hours_h}h {sleep_minutes}m  
     • **Breaks:** {break_count} (avg {avg_break_duration} min)  
-    • **Screen Time:** {round(screen_time, 2)} hours  
+    • **Screen Time:** {screen_hours}h {screen_minutes}m  
     • **Difficulty:** {difficulty_level}/5  
     • **Revision:** {"Yes" if revision_done else "No"}  
     • **Mood:** {mood_score}/5  
@@ -319,6 +296,7 @@ if st.button("🔍 Analyze My Study Pattern"):
     st.subheader("🧠 Recommendations")
     for tip in burnout_advice(burnout_level, input_data):
         st.write("•", tip)
+
 
 
 
