@@ -83,19 +83,21 @@ def sanitize_inputs(user):
     }
 
 def compute_raw_burnout_score(user):
-    sleep_penalty = min(7 - user["sleep_hours"], 5)
-    study_penalty = min(user["study_hours"], 8)
-    screen_penalty = min(user["screen_time"], 8)
-    break_penalty = min(user["break_count"], 6)
-    mood_penalty = 5 - user["mood_score"]
+    sleep_penalty = max(0, 7 - user["sleep_hours"])
+    study_penalty = max(0, user["study_hours"] - 3)
+    screen_penalty = max(0, user["screen_time"] - 3)
+    break_penalty = max(0, user["break_count"] - 2)
+    mood_penalty = max(0, 4 - user["mood_score"])
 
-    return (
-        0.6 * sleep_penalty +
+    burnout = (
+        0.7 * sleep_penalty +
         0.4 * study_penalty +
         0.3 * screen_penalty +
         0.3 * break_penalty +
         0.5 * mood_penalty
     )
+
+    return round(burnout, 2)
 
 def burnout_advice(burnout_level, user):
     advice = []
@@ -161,9 +163,9 @@ if st.button("🔍 Analyze My Study Pattern"):
     # Burnout level
     if raw_score >= 7.5:
         burnout_level = "Very High"
-    elif raw_score >= 5.5:
+    elif raw_score >= 5:
         burnout_level = "High"
-    elif raw_score >= 3.5:
+    elif raw_score >= 2.5:
         burnout_level = "Moderate"
     else:
         burnout_level = "Low"
@@ -178,3 +180,4 @@ if st.button("🔍 Analyze My Study Pattern"):
     st.subheader("🧠 Recommendations")
     for tip in burnout_advice(burnout_level, input_data):
         st.write("•", tip)
+
