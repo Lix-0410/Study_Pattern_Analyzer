@@ -5,39 +5,147 @@ import joblib
 perf_model = joblib.load("models/performance_model.pkl")
 burnout_model = joblib.load("models/burnout_model.pkl")
 
-st.set_page_config(
-    page_title="Smart Study Pattern Analyzer",
-    layout="centered"
-)
-
-st.title("📘 Smart Study Pattern Analyzer")
-st.write(
-    "Enter your study details to predict performance "
-    "and assess burnout risk."
-)
-
 st.header("🧑‍🎓 Your Study Details")
+st.subheader("⏱️ Study Duration")
 
-study_hours = st.slider("Study hours per day", 0.5, 10.0, 4.0)
-sleep_hours = st.slider("Sleep hours", 1.0, 10.0, 7.0)
-break_count = st.slider("Number of breaks", 1, 10, 3)
-avg_break_duration = st.slider("Average break duration (minutes)", 5, 40, 10)
-screen_time = st.slider("Screen time (hours)", 1.0, 12.0, 4.0)
+study_slider = st.slider(
+    "Study time (quick select)",
+    min_value=0.0,
+    max_value=10.0,
+    value=4.0,
+    step=1/6,   # 10 minutes
+    key="study_slider"
+)
+
+study_h_default = int(study_slider)
+study_m_default = int(round((study_slider - study_h_default) * 60 / 10) * 10)
+
+col1, col2 = st.columns(2)
+with col1:
+    study_hours_h = st.number_input(
+        "Study hours",
+        min_value=0,
+        max_value=10,
+        value=study_h_default,
+        step=1
+    )
+
+with col2:
+    study_minutes = st.number_input(
+        "Study minutes (10-min steps)",
+        min_value=0,
+        max_value=50,
+        value=study_m_default,
+        step=10
+    )
+
+study_hours = study_hours_h + study_minutes / 60
+st.caption(f"📌 Final study time: **{study_hours_h}h {study_minutes}m**")
+
+st.subheader("😴 Sleep Duration")
+
+sleep_slider = st.slider(
+    "Sleep time (quick select)",
+    min_value=1.0,
+    max_value=10.0,
+    value=7.0,
+    step=1/6,
+    key="sleep_slider"
+)
+
+sleep_h_default = int(sleep_slider)
+sleep_m_default = int(round((sleep_slider - sleep_h_default) * 60 / 10) * 10)
+
+col1, col2 = st.columns(2)
+with col1:
+    sleep_hours_h = st.number_input(
+        "Sleep hours",
+        min_value=1,
+        max_value=10,
+        value=sleep_h_default,
+        step=1
+    )
+
+with col2:
+    sleep_minutes = st.number_input(
+        "Sleep minutes (10-min steps)",
+        min_value=0,
+        max_value=50,
+        value=sleep_m_default,
+        step=10
+    )
+
+sleep_hours = sleep_hours_h + sleep_minutes / 60
+st.caption(f"🛌 Final sleep time: **{sleep_hours_h}h {sleep_minutes}m**")
+
+st.subheader("☕ Breaks")
+
+break_count = st.slider(
+    "Number of breaks taken",
+    min_value=0,
+    max_value=10,
+    value=3
+)
+
+avg_break_duration = st.slider(
+    "Average break duration (minutes)",
+    min_value=5,
+    max_value=40,
+    value=10,
+    step=5
+)
+
+st.subheader("📱 Screen Time")
+
+screen_time = st.slider(
+    "Total screen time",
+    min_value=0.0,
+    max_value=12.0,
+    value=4.0,
+    step=1/6
+)
+
+st.caption(f"📱 Screen time: **{round(screen_time, 2)} hours**")
+
+st.subheader("📚 Study Difficulty")
 
 difficulty_level = st.slider(
-    "Difficulty of what you're studying (1 = Easy, 5 = Very Hard)",
-    1, 5, 3
+    "Difficulty of today's study (1 = Easy, 5 = Very Hard)",
+    min_value=1,
+    max_value=5,
+    value=3
 )
 
-revision_done = st.selectbox(
+st.subheader("🔁 Revision")
+
+revision_done = st.radio(
     "Did you revise today?",
-    [0, 1],
-    format_func=lambda x: "Yes" if x == 1 else "No"
+    [1, 0],
+    format_func=lambda x: "Yes" if x == 1 else "No",
+    horizontal=True
 )
+
+st.subheader("🙂 Mental State")
 
 mood_score = st.slider(
-    "Your mental state today (1 = Very stressed, 5 = Highly motivated)",
-    1, 5, 3
+    "How did you feel today? (1 = Very stressed, 5 = Highly motivated)",
+    min_value=1,
+    max_value=5,
+    value=3
+)
+
+st.markdown("### 📝 Summary")
+
+st.write(
+    f"""
+    • **Study Time:** {study_hours_h}h {study_minutes}m  
+    • **Sleep:** {sleep_hours_h}h {sleep_minutes}m  
+    • **Breaks:** {break_count} breaks (avg {avg_break_duration} min)  
+    • **Screen Time:** {round(screen_time, 2)} hours  
+    • **Difficulty:** {difficulty_level}/5  
+    • **Revision Done:** {"Yes" if revision_done else "No"}  
+    • **Mood:** {mood_score}/5  
+    """
 )
 
 focus_score = study_hours / (break_count + 1)
@@ -180,4 +288,5 @@ if st.button("🔍 Analyze My Study Pattern"):
     st.subheader("🧠 Recommendations")
     for tip in burnout_advice(burnout_level, input_data):
         st.write("•", tip)
+
 
